@@ -15,54 +15,9 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage>
-    with SingleTickerProviderStateMixin {
-  TextEditingController name = TextEditingController(text: 'Sanskriti ');
+class _HomePageState extends State<HomePage> {
   TextEditingController present = TextEditingController(text: 'present ');
 
-  AnimationController controller;
-
-  @override
-  void initState1() {
-    super.initState();
-    controller = AnimationController(
-      duration: Duration(seconds: 3),
-      vsync: this,
-    );
-    controller.addStatusListener(
-      (status) async {
-        if (status == AnimationStatus.completed) {
-          Navigator.pop(context);
-        }
-      },
-    );
-  }
-
-  @override
-  void dispose1() {
-    controller.dispose();
-    super.dispose();
-  }
-
-  void showDoneDialog() => showDialog(
-        barrierDismissible: false,
-        context: context,
-        builder: (context) => Dialog(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Lottie.asset(
-                'assets/done.json',
-                repeat: false,
-                controller: controller,
-                onLoaded: (composition) {
-                  controller.forward();
-                },
-              ),
-            ],
-          ),
-        ),
-      );
   final fb = FirebaseDatabase.instance;
   bool loading = true;
   File _image;
@@ -211,14 +166,13 @@ class _HomePageState extends State<HomePage>
                           MaterialButton(
                             color: Color.fromARGB(255, 126, 45, 119),
                             onPressed: () {
-                              
-                              ref.push().set(
-                                present.text).asStream();
+                              ref.push().set(present.text).asStream();
 
-                               Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => examination()),
-                );
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => examination()),
+                              );
                             },
                             child: Text(
                               "save",
