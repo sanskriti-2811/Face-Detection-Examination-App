@@ -1,7 +1,9 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_database/ui/firebase_animated_list.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
@@ -17,6 +19,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   TextEditingController present = TextEditingController(text: 'present ');
+  final database = FirebaseDatabase.instance.reference();
 
   final fb = FirebaseDatabase.instance;
   bool loading = true;
@@ -78,116 +81,126 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final attendance = database.child('Attendance');
     final ref = fb.ref().child('mark-attendance');
 
     var h = MediaQuery.of(context).size.height;
     var w = MediaQuery.of(context).size.width;
     return Scaffold(
-        appBar: AppBar(
-          title: Text(
-            'Examination Protal',
-            style: GoogleFonts.roboto(),
-          ),
+      appBar: AppBar(
+        title: Text(
+          'Examination Protal',
+          style: GoogleFonts.roboto(),
         ),
-        body: Container(
-          decoration: BoxDecoration(
-              image: DecorationImage(
-            image: AssetImage("assets/background.jpg"),
-            fit: BoxFit.cover,
-          )),
-          height: h,
-          width: w,
-          child: Column(
-            children: [
-              Container(
-                alignment: Alignment.center,
-                height: 150,
-                width: 150,
-                padding: EdgeInsets.all(10),
-                child: Image.asset('assets/scanner.png'),
+      ),
+      body: Container(
+        decoration: BoxDecoration(
+            image: DecorationImage(
+          image: AssetImage("assets/background.jpg"),
+          fit: BoxFit.cover,
+        )),
+        height: h,
+        width: w,
+        child: Column(
+          children: [
+            Container(
+              alignment: Alignment.center,
+              height: 150,
+              width: 150,
+              padding: EdgeInsets.all(10),
+              child: Image.asset('assets/scanner.png'),
+            ),
+            Container(
+                child: Text('Face Detector',
+                    style: GoogleFonts.roboto(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ))),
+            SizedBox(height: 50),
+            Container(
+              child: Column(
+                children: [
+                  Container(
+                    padding: EdgeInsets.only(left: 10, right: 10),
+                    height: 50,
+                    width: double.infinity,
+                    child: RaisedButton(
+                        color: Color.fromARGB(255, 143, 49, 115),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10)),
+                        child: Text('Capture',
+                            style: GoogleFonts.roboto(fontSize: 18)),
+                        onPressed: () {
+                          pickimage_camera();
+                        }),
+                  ),
+                  SizedBox(height: 10),
+                  Container(
+                    padding: EdgeInsets.only(left: 10, right: 10),
+                    height: 50,
+                    width: double.infinity,
+                    child: RaisedButton(
+                        color: Color.fromARGB(255, 143, 49, 115),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10)),
+                        child: Text('Gallery',
+                            style: GoogleFonts.roboto(fontSize: 18)),
+                        onPressed: () {
+                          pickimage_gallery();
+                        }),
+                  ),
+                ],
               ),
-              Container(
-                  child: Text('Face Detector',
-                      style: GoogleFonts.roboto(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ))),
-              SizedBox(height: 50),
-              Container(
-                child: Column(
-                  children: [
-                    Container(
-                      padding: EdgeInsets.only(left: 10, right: 10),
-                      height: 50,
-                      width: double.infinity,
-                      child: RaisedButton(
-                          color: Color.fromARGB(255, 143, 49, 115),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10)),
-                          child: Text('Capture',
-                              style: GoogleFonts.roboto(fontSize: 18)),
+            ),
+            loading != true
+                ? Container(
+                    child: Column(
+                      children: [
+                        Container(
+                          height: 220,
+                          // width: double.infinity,
+                          padding: EdgeInsets.all(15),
+                          child: Image.file(_image),
+                        ),
+                        _output != null
+                            ? Text(
+                                (_output[0]['label']).toString().substring(2),
+                                style: GoogleFonts.roboto(fontSize: 18))
+                            : Text(''),
+                        MaterialButton(
+                          color: Color.fromARGB(255, 126, 45, 119),
                           onPressed: () {
-                            pickimage_camera();
-                          }),
-                    ),
-                    SizedBox(height: 10),
-                    Container(
-                      padding: EdgeInsets.only(left: 10, right: 10),
-                      height: 50,
-                      width: double.infinity,
-                      child: RaisedButton(
-                          color: Color.fromARGB(255, 143, 49, 115),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10)),
-                          child: Text('Gallery',
-                              style: GoogleFonts.roboto(fontSize: 18)),
-                          onPressed: () {
-                            pickimage_gallery();
-                          }),
-                    ),
-                  ],
-                ),
-              ),
-              loading != true
-                  ? Container(
-                      child: Column(
-                        children: [
-                          Container(
-                            height: 220,
-                            // width: double.infinity,
-                            padding: EdgeInsets.all(15),
-                            child: Image.file(_image),
-                          ),
-                          _output != null
-                              ? Text(
-                                  (_output[0]['label']).toString().substring(2),
-                                  style: GoogleFonts.roboto(fontSize: 18))
-                              : Text(''),
-                          MaterialButton(
-                            color: Color.fromARGB(255, 126, 45, 119),
-                            onPressed: () {
-                              ref.push().set(present.text).asStream();
-
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => examination()),
-                              );
-                            },
-                            child: Text(
-                              "save",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 20,
-                              ),
+                            final nextStudent = <String, dynamic>{
+                              'name': getName(),
+                              'mark': 'present',
+                            };
+                            database
+                                .child('Attendance')
+                                .push()
+                                .set(nextStudent);
+                          },
+                          child: Text(
+                            "save",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 20,
                             ),
                           ),
-                        ],
-                      ),
-                    )
-                  : Container(),
-            ],
-          ),
-        ));
+                        ),
+                      ],
+                    ),
+                  )
+                : Container(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  String  getName() {
+   
+    final studentName= _output[0]['label'].toString().substring(2);
+    
+    return studentName[Random().nextInt(studentName.length)];
   }
 }
