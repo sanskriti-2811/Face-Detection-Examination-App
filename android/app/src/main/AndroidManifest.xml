@@ -3,7 +3,7 @@
 
      <uses-permission android:name="android.permission.INTERNET" />
    <application
-        android:label="mask_app"
+        android:label="EX-zam"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
@@ -33,4 +33,5 @@
             android:name="flutterEmbedding"
             android:value="2" />
     </application>
+    <uses-permission android:name="android.permission.INTERNET" />
 </manifest>
