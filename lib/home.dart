@@ -178,6 +178,11 @@ class _HomePageState extends State<HomePage> {
                                 .child('Attendance')
                                 .push()
                                 .set(nextStudent);
+                                 Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => examination()),
+                              );
                           },
                           child: Text(
                             "save",
